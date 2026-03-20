@@ -1,9 +1,11 @@
 package portifolio.qrcodegen.service;
 
 import jakarta.transaction.Transactional;
-import org.aspectj.weaver.IClassFileProvider;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import portifolio.qrcodegen.dto.CadastroDTO;
+import portifolio.qrcodegen.dto.VoucherDashboardDTO;
 import portifolio.qrcodegen.entity.StatusVoucher;
 import portifolio.qrcodegen.entity.VoucherCad;
 import portifolio.qrcodegen.exception.RegraNegocioException;
@@ -52,14 +54,38 @@ public class VoucherCadService {
     @Transactional
     public void validarResgate(String token){
         VoucherCad voucherCad = voucherCadRepository.findByToken(token)
-                .orElseThrow( () -> new RuntimeException("Qr Code invalido!"));
+                .orElseThrow( () -> new RegraNegocioException("Qr Code invalido!"));
 
         if (voucherCad.getStatus() == StatusVoucher.RESGATADO){
-            throw new RuntimeException("Este brinde ja foi resgatado!");
+            throw new RegraNegocioException("Este brinde ja foi resgatado!");
         }
 
         voucherCad.setStatus(StatusVoucher.RESGATADO);
         voucherCad.setDataResgate(Instant.now());
+        voucherCadRepository.save(voucherCad);
+    }
+
+    public Page<VoucherDashboardDTO> listarTodosParaDashboard(Pageable pageable){
+        Page<VoucherCad> paginaVoucher = voucherCadRepository.findAll(pageable);
+        return paginaVoucher.map(voucher -> new VoucherDashboardDTO(
+                voucher.getId(),
+                voucher.getNome(),
+                voucher.getStatus().toString(),
+                voucher.getEmail()
+        ));
+    }
+
+    public void validarResgateManual(Long id){
+        VoucherCad voucherCad = voucherCadRepository.findById(id)
+                .orElseThrow(() -> new RegraNegocioException("Voucher nao encontrado no sistema"));
+
+        if (voucherCad.getStatus().equals(StatusVoucher.RESGATADO)){
+            throw new RegraNegocioException("Atenção: Voucher ja consta como resgatado");
+        }
+
+        voucherCad.setStatus(StatusVoucher.RESGATADO);
+        voucherCad.setDataResgate(Instant.now());
+
         voucherCadRepository.save(voucherCad);
     }
 }

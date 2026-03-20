@@ -30,4 +30,10 @@ public class QrCodeController {
         voucherCadService.validarResgate(qrCodeDTO.token());
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/resgatar/{id}")
+    public ResponseEntity<Void> resgateManualAdmin(@PathVariable Long id){
+        voucherCadService.validarResgateManual(id);
+        return ResponseEntity.ok().build();
+    }
 }
