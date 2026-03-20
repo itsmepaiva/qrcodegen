@@ -60,6 +60,22 @@
 <button id="btn-reiniciar" style="display: none;" onclick="reiniciarScanner()">Ler Novo QR Code</button>
 
 <script>
+    // 1. Variável global para armazenar a credencial em Base64 temporariamente
+    let credencialAdmin = null;
+
+    // 2. Função para exibir a janela e pedir usuário e senha
+    function pedirCredenciais() {
+        let usuario = prompt("🔒 Área Restrita\nDigite o usuário Admin:");
+        if (!usuario) return false; // Se cancelar ou deixar vazio, retorna falso
+
+        let senha = prompt("🔑 Digite a senha:");
+        if (!senha) return false;
+
+        // Converte "usuario:senha" para o formato Base64 exigido pelo Basic Auth
+        credencialAdmin = btoa(usuario + ":" + senha);
+        return true;
+    }
+
     // Configuração do leitor
     const html5QrcodeScanner = new Html5QrcodeScanner(
         "reader",
@@ -69,25 +85,40 @@
 
     // Função executada quando a câmera acha um QR Code
     function onScanSuccess(decodedText, decodedResult) {
-        // 1. Para o leitor imediatamente para não disparar 50 requisições seguidas
+        // Para o leitor imediatamente para não disparar requisições duplicadas
         html5QrcodeScanner.clear();
+
+        // 3. Verifica se o operador já fez login. Se não, abre o prompt.
+        if (!credencialAdmin) {
+            let logado = pedirCredenciais();
+            if (!logado) {
+                mostrarMensagem("❌ Login cancelado ou inválido. Não é possível resgatar.", "erro");
+                document.getElementById('btn-reiniciar').style.display = "block";
+                return; // Aborta a requisição se não tiver credencial
+            }
+        }
+
         mostrarMensagem("Processando...", "sucesso");
 
-        // 2. Dispara a requisição para o seu back-end Java
-        // ATENÇÃO: Ajuste a URL se o seu Spring Boot estiver em outra porta
+        // 4. Dispara a requisição para o back-end com a credencial
         fetch('http://localhost:8080/qrcode/resgatar', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic ' + credencialAdmin // Adiciona o cabeçalho de segurança aqui
             },
-            body: JSON.stringify({ token: decodedText }) // Manda o UUID lido
+            body: JSON.stringify({ token: decodedText })
         })
         .then(async response => {
             if (response.ok) {
                 // Status 200 OK
                 mostrarMensagem("✅ Brinde Liberado com Sucesso!", "sucesso");
+            } else if (response.status === 401) {
+                // Status 401: Acesso negado (senha errada no Spring Security)
+                mostrarMensagem("❌ Acesso Negado: Usuário ou senha incorretos.", "erro");
+                credencialAdmin = null; // Zera a credencial errada para ele tentar de novo
             } else {
-                // Se deu erro (ex: 400 Bad Request), tenta ler o JSON da sua RegraNegocioException
+                // Outros erros da regra de negócio (ex: QR code já resgatado)
                 const data = await response.json();
                 mostrarMensagem("❌ " + (data.mensagemErro || "Erro ao resgatar."), "erro");
             }
