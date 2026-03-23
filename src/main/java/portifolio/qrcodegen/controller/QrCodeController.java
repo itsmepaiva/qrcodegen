@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import portifolio.qrcodegen.dto.CadastroDTO;
 import portifolio.qrcodegen.dto.ResgateQrCodeDTO;
+import portifolio.qrcodegen.dto.ResgateResponseDTO;
 import portifolio.qrcodegen.service.VoucherCadService;
 
 @RestController
@@ -26,14 +27,20 @@ public class QrCodeController {
     }
 
     @PostMapping("/resgatar")
-    public ResponseEntity<Void> resgatarQrCode(@RequestBody @Valid ResgateQrCodeDTO qrCodeDTO){
-        voucherCadService.validarResgate(qrCodeDTO.token());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ResgateResponseDTO> resgatarQrCode(@RequestBody @Valid ResgateQrCodeDTO qrCodeDTO){
+        ResgateResponseDTO resgateResponseDTO = voucherCadService.validarResgate(qrCodeDTO.token());
+        return ResponseEntity.ok(resgateResponseDTO);
     }
 
     @PutMapping("/resgatar/{id}")
     public ResponseEntity<Void> resgateManualAdmin(@PathVariable Long id){
         voucherCadService.validarResgateManual(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity<Void> deletarVoucher(@PathVariable Long id){
+        voucherCadService.deletarVoucher(id);
         return ResponseEntity.ok().build();
     }
 }

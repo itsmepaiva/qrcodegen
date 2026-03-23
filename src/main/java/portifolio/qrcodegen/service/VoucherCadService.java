@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import portifolio.qrcodegen.dto.CadastroDTO;
+import portifolio.qrcodegen.dto.ResgateResponseDTO;
 import portifolio.qrcodegen.dto.VoucherDashboardDTO;
 import portifolio.qrcodegen.entity.StatusVoucher;
 import portifolio.qrcodegen.entity.VoucherCad;
@@ -48,11 +49,11 @@ public class VoucherCadService {
 
         byte[] imagemQrCode = qrCodeGenerator.gerarQrCode(tokenUnico);
 
-        emailService.enviarEmailcomQrCode(voucherCad.getEmail(), imagemQrCode);
+        emailService.enviarEmailcomQrCode(voucherCad.getEmail(), voucherCad.getNome(), imagemQrCode);
     }
 
     @Transactional
-    public void validarResgate(String token){
+    public ResgateResponseDTO validarResgate(String token){
         VoucherCad voucherCad = voucherCadRepository.findByToken(token)
                 .orElseThrow( () -> new RegraNegocioException("Qr Code invalido!"));
 
@@ -63,6 +64,7 @@ public class VoucherCadService {
         voucherCad.setStatus(StatusVoucher.RESGATADO);
         voucherCad.setDataResgate(Instant.now());
         voucherCadRepository.save(voucherCad);
+        return new ResgateResponseDTO(voucherCad.getNome(), voucherCad.getEmail());
     }
 
     public Page<VoucherDashboardDTO> listarTodosParaDashboard(Pageable pageable){
@@ -70,8 +72,8 @@ public class VoucherCadService {
         return paginaVoucher.map(voucher -> new VoucherDashboardDTO(
                 voucher.getId(),
                 voucher.getNome(),
-                voucher.getStatus().toString(),
-                voucher.getEmail()
+                voucher.getEmail(),
+                voucher.getStatus().toString()
         ));
     }
 
@@ -87,5 +89,9 @@ public class VoucherCadService {
         voucherCad.setDataResgate(Instant.now());
 
         voucherCadRepository.save(voucherCad);
+    }
+
+    public void deletarVoucher(Long id) {
+        voucherCadRepository.deleteById(id);
     }
 }
