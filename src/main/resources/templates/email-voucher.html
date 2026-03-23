@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f5; margin: 0; padding: 40px 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; }
+        .content { padding: 40px 30px; text-align: center; color: #374151; line-height: 1.6; }
+        .qr-box { margin: 30px auto; padding: 20px; background-color: #f9fafb; border: 2px dashed #cbd5e1; border-radius: 12px; display: inline-block; }
+        .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #f3f4f6; }
+        .btn { display: inline-block; background-color: #667eea; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 style="margin: 0; font-size: 24px;">Seu Brinde Chegou! 🎉</h1>
+    </div>
+    <div class="content">
+        <h2 style="color: #111827; margin-top: 0;" th:text="'Olá, ' + ${nome} + '!'">Olá, Cliente!</h2>
+
+        <p>Seu cadastro foi realizado com sucesso. Aqui está o seu passaporte para resgatar o seu brinde exclusivo.</p>
+
+        <div class="qr-box">
+            <p style="margin-top: 0; font-weight: bold; color: #6b7280;">Apresente este QR Code no balcão:</p>
+            <img src="cid:qrcode_img" alt="Seu QR Code" style="width: 200px; height: 200px; border-radius: 8px;">
+        </div>
+
+        <p>Guarde este e-mail com carinho. Ele é único e intransferível.</p>
+    </div>
+    <div class="footer">
+        <p>&copy; 2026 8bitibs. Todos os direitos reservados.</p>
+        <p>Se você não solicitou este e-mail, por favor, ignore-o.</p>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Sistema de Brindes</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <div class="header-content">
+                <div>
+                    <h1 class="card-title">Dashboard de Vouchers</h1>
+                    <p class="card-description">Gerencie os resgates e acompanhe o status dos QR Codes</p>
+                </div>
+                <button class="btn btn-primary" id="btnLerQrCode">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>
+                    </svg>
+                    Ler QR Code
+                </button>
+            </div>
+        </div>
+
+        <div class="card-content">
+
+            <div id="scanner-container" style="display: none; margin-bottom: 20px; text-align: center;">
+                <div id="reader" style="width: 100%; max-width: 500px; margin: 0 auto; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"></div>
+                <div id="resultado-scanner" style="margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 5px; display: none;"></div>
+                <button id="btnFecharScanner" class="btn btn-ghost" style="margin-top: 10px; border: 1px solid #ccc;">Fechar Câmera</button>
+            </div>
+
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nome ou email...">
+                </div>
+            </div>
+
+            <div class="total-count">
+                Total de registros: <span id="totalCount" class="count-number">0</span>
+            </div>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th class="text-right">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody id="clientsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="admin-script.js"></script>
+</body>
+</html>
